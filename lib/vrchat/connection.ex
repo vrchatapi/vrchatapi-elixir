@@ -36,7 +36,8 @@ defmodule VRChat.Connection do
           {:user_agent, String.t()},
           {:username, String.t() | nil},
           {:password, String.t() | nil},
-          {:headers, [{String.t(), String.t()}] | nil}
+          {:totp_secret, String.t() | nil},
+          {:cookies, [{String.t(), String.t()}] | nil}
         ]
 
   @doc "Forward requests to Tesla."
@@ -124,6 +125,7 @@ defmodule VRChat.Connection do
 
     username = Keyword.get(options, :username)
     password = Keyword.get(options, :password)
+    totp_secret = Keyword.get(options, :totp_secret)
 
     middleware =
       if username || password do
@@ -132,12 +134,17 @@ defmodule VRChat.Connection do
         middleware
       end
 
-    headers = [{"user-agent", user_agent}] ++ Keyword.get(options, :headers, [])
+    headers = [
+      {"user-agent", user_agent},
+      {"cookie", VRChat.Middleware.stringify_cookies(Keyword.get(options, :cookies, []))}
+    ]
 
     [
+      {Tesla.Middleware.Logger, []},
       {Tesla.Middleware.BaseUrl, base_url},
       {Tesla.Middleware.Headers, headers},
-      {Tesla.Middleware.EncodeJson, engine: json_engine}
+      {Tesla.Middleware.EncodeJson, engine: json_engine},
+      {VRChat.Middleware, totp_secret: totp_secret}
       | middleware
     ]
   end

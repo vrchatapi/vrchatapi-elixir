@@ -104,7 +104,7 @@ defmodule VRChat.Authentication do
   - `{:error, Tesla.Env.t}` on failure
   """
   @spec get_current_user(Tesla.Env.client(), keyword()) ::
-          {:ok, VRChat.Model.CurrentUser.t()}
+          {:ok, Tesla.Env.client(), VRChat.Model.CurrentUser.t()}
           | {:ok, VRChat.Model.Error.t()}
           | {:error, Tesla.Env.t()}
   def get_current_user(connection, _opts \\ []) do
@@ -114,37 +114,25 @@ defmodule VRChat.Authentication do
       |> url("/auth/user")
       |> Enum.into([])
 
-    connection
-    |> Connection.request(request)
-    |> assign_session(connection)
-  end
+    with {:ok, response, conn} <-
+           connection
+           |> Connection.request(request)
+           |> VRChat.Middleware.assign_session(request) do
+            IO.inspect(response)
+      {:ok, value} = evaluate_response(response, [
+          {200, %VRChat.Model.CurrentUser{}},
+          {401, %VRChat.Model.Error{}}
+        ])
 
-  defp assign_session({:error, response}, _) do
-    {:ok, %VRChat.Model.Error{}, response}
-  end
-
-  defp assign_session({:ok, %Tesla.Env{headers: headers}} = response, connection) do
-    {code, user} =
-      response
-      |> evaluate_response([
-        {200, %VRChat.Model.CurrentUser{}},
-        {401, %VRChat.Model.Error{}}
-      ])
-
-    {code, user,
-     Connection.new(
-       headers:
-         headers
-         |> Enum.filter(fn {x, _} -> x == "set-cookie" end)
-         |> Enum.map(fn {"set-cookie", data} -> {"cookie", data} end)
-     )}
+      {:ok, conn, value}
+    end
   end
 
   def login(options) when is_list(options) do
-    with {:ok, user, connection} <-
+    with {:ok, conn, user} <-
            VRChat.Connection.new(options)
            |> get_current_user() do
-      {:ok, connection, user}
+      {:ok, conn, user}
     end
   end
 
@@ -198,7 +186,7 @@ defmodule VRChat.Authentication do
   - `{:error, Tesla.Env.t}` on failure
   """
   @spec verify2_fa(Tesla.Env.client(), keyword()) ::
-          {:ok, VRChat.Model.Verify2FaResult.t()}
+          {:ok, Tesla.Env.client(), VRChat.Model.Verify2FaResult.t()}
           | {:ok, VRChat.Model.Error.t()}
           | {:error, Tesla.Env.t()}
   def verify2_fa(connection, opts \\ []) do
@@ -214,12 +202,17 @@ defmodule VRChat.Authentication do
       |> ensure_body()
       |> Enum.into([])
 
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, %VRChat.Model.Verify2FaResult{}},
-      {401, %VRChat.Model.Error{}}
-    ])
+    with {:ok, response, conn} <-
+           connection
+           |> Connection.request(request)
+           |> VRChat.Middleware.assign_session(request) do
+      {:ok, value} = evaluate_response(response, [
+        {200, %VRChat.Model.Verify2FaResult{}},
+        {401, %VRChat.Model.Error{}}
+      ])
+
+      {:ok, conn, value}
+    end
   end
 
   @doc """
