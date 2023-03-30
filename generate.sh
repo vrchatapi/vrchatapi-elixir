@@ -1,19 +1,18 @@
 #!/bin/bash
+set -e
 
 npm install @openapitools/openapi-generator-cli
-
-cp ./mix.exs ./mix.exs_bak
 
 rm lib test config *.exs *.lock -rf
 
 ./node_modules/\@openapitools/openapi-generator-cli/main.js generate \
--g elixir \
---additional-properties="packageName=vrchat,invokerPackage=VRChat" \
---git-user-id=polyjitter \
---git-repo-id=vrchatapi-elixir \
--o . \
--i https://raw.githubusercontent.com/vrchatapi/specification/gh-pages/openapi.yaml \
---http-user-agent="vrchatapi-elixir"
+	-g elixir \
+	--additional-properties="packageName=vrchat,invokerPackage=VRChat" \
+	--git-user-id=vrchatapi \
+	--git-repo-id=vrchat-elixir \
+	-o . \
+	-i https://raw.githubusercontent.com/vrchatapi/specification/gh-pages/openapi.yaml \
+	--http-user-agent="vrchatapi-elixir"
 
 # Rename config key
 
@@ -28,7 +27,13 @@ sed -i "s/vr_chat/vrchat/g" ./.openapi-generator/FILES
 
 sed -i "s/Elixir/vrchat-elixir/" ./lib/vrchat/connection.ex
 
-# Set up cookie based authentication
-git apply --ignore-space-change --ignore-whitespace patches/cookies.patch
+find . -type f -name "*.ex" -exec sed -i "s/VRChat.Api./VRChat./g" {} \;
 
-cp ./mix.exs_bak ./mix.exs
+#git apply patches/authentication.patch
+
+mix deps.get
+mix format
+mix compile
+
+# Set up cookie based authentication
+# git apply --ignore-space-change --ignore-whitespace ./patches/cookies.patch

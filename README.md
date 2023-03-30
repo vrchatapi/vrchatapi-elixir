@@ -39,10 +39,10 @@ Documentation can be found at [https://hexdocs.pm/vrchat](https://hexdocs.pm/vrc
 ## Usage
 ```elixir
 
-tempconn = VRChat.Connection.new(username, password)
-{:ok, user, conn} = VRChat.Api.Authentication.get_current_user(tempconn)
+conn = VRChat.Connection.new(username, password)
+{:ok, user, conn} = VRChat.Authentication.get_current_user(tempconn)
 
-VRChat.Api.Avatars.get_avatar(conn, user.currentAvatar)
+VRChat.Avatars.get_avatar(conn, user.currentAvatar)
 ```
 
 `get_current_user` validates the username and password, and returns a
@@ -51,7 +51,7 @@ rest of the api.
 
 ## Configuration
 
-You can override the URL of your server (e.g. if you have a separate development and production server in your configuration files.
+You can override the URL of your server (e.g. if you have a separate development and production server in your configuration files)
 ```elixir
 config :vrchat, base_url: "https://api.vrchat.cloud/api/1"
 ```

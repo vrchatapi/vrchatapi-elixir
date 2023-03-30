@@ -1,0 +1,49 @@
+diff --git a/lib/vrchat/api/authentication.ex b/lib/vrchat/api/authentication.ex
+index 581f3fe..1f17b46 100644
+--- a/lib/vrchat/api/authentication.ex
++++ b/lib/vrchat/api/authentication.ex
+@@ -107,10 +107,27 @@ defmodule VRChat.Api.Authentication do
+ 
+     connection
+     |> Connection.request(request)
+-    |> evaluate_response([
+-      {200, %VRChat.Model.CurrentUser{}},
+-      {401, %VRChat.Model.Error{}}
+-    ])
++    |> attach_current_user_auth()
++  end
++
++  def attach_current_user_auth({:error, response}) do
++    {401, %VRChat.Model.Error{}, response}
++  end
++
++  def attach_current_user_auth({:ok, %Tesla.Env{headers: headers}} = response) do
++    cookies =
++      headers
++      |> Enum.filter(fn {x, _} -> x == "set-cookie" end)
++      |> Enum.map(fn {"set-cookie", data} -> {"cookie", data} end)
++
++    {code, user} =
++      response
++      |> evaluate_response([
++        {200, %VRChat.Model.CurrentUser{}},
++        {401, %VRChat.Model.Error{}}
++      ])
++
++    {code, user, Connection.new(cookies)}
+   end
+ 
+   @doc """
+diff --git a/lib/vrchat/connection.ex b/lib/vrchat/connection.ex
+index e4d1260..38e6ac2 100644
+--- a/lib/vrchat/connection.ex
++++ b/lib/vrchat/connection.ex
+@@ -87,7 +107,7 @@ defmodule VRChat.Connection do
+ 
+   Tesla.Env.client
+   """
+-  @spec new(String.t(), String.t()), options) :: Tesla.Env.client()
++  @spec new(String.t(), String.t(), options) :: Tesla.Env.client()
+ 
+ 
+   def new(username, password, options) when is_binary(username) and is_binary(password) do
