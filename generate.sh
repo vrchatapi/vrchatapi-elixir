@@ -29,7 +29,7 @@ sed -i "s/Elixir/vrchat-elixir/" ./lib/vrchat/connection.ex
 
 find . -type f -name "*.ex" -exec sed -i "s/VRChat.Api./VRChat./g" {} \;
 
-#git apply patches/authentication.patch
+git apply patches/authentication.patch
 
 mix deps.get
 mix format
