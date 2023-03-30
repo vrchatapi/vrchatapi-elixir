@@ -118,8 +118,6 @@ defmodule VRChat.Authentication do
            connection
            |> Connection.request(request)
            |> VRChat.Middleware.assign_session(request) do
-      IO.inspect(response)
-
       {:ok, value} =
         evaluate_response(response, [
           {200, %VRChat.Model.CurrentUser{}},

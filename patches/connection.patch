@@ -48,7 +48,7 @@ index e4d1260..1a9bf6a 100644
 +    ]
  
      [
-+      {Tesla.Middleware.Logger, []},
++      #{Tesla.Middleware.Logger, []},
        {Tesla.Middleware.BaseUrl, base_url},
 -      {Tesla.Middleware.Headers, [{"user-agent", user_agent}]},
 -      {Tesla.Middleware.EncodeJson, engine: json_engine}

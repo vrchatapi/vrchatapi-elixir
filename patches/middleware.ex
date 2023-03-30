@@ -5,7 +5,9 @@ defmodule VRChat.Middleware do
   def parse_cookies(nil), do: []
 
   def parse_cookies(cookie) do
-    String.split(cookie, "; ") |> Enum.map(&parse_cookie(&1))
+    String.split(cookie, "; ")
+    |> Enum.filter(&(&1 !== ""))
+    |> Enum.map(&parse_cookie(&1))
   end
 
   def parse_cookie(cookie) do
@@ -82,15 +84,15 @@ defmodule VRChat.Middleware do
         raise "email two factor not supported, consider enabling totp and provide the generation secret via :totp_secret"
 
       %{"requiresTwoFactorAuth" => ["totp", "otp"]} ->
-        {:ok, client, _} =
-          VRChat.Authentication.verify2_fa(client,
-            body: %VRChat.Model.TwoFactorAuthCode{
-              code: NimbleTOTP.verification_code(totp_secret, time: NaiveDateTime.utc_now())
-            }
-          )
-
-        # resend request with new session
-        {:ok, client, Connection.request(client, request)}
+        with {:ok, client, _} <-
+               VRChat.Authentication.verify2_fa(client,
+                 body: %VRChat.Model.TwoFactorAuthCode{
+                   code: NimbleTOTP.verification_code(totp_secret, time: NaiveDateTime.utc_now())
+                 }
+               ),
+             {:ok, response} <- Connection.request(client, request) do
+          {:ok, client, response}
+        end
 
       _ ->
         {:ok, client, {:ok, response}}

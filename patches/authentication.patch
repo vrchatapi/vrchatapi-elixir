@@ -11,7 +11,7 @@ index ab4032a..1f79085 100644
            | {:ok, VRChat.Model.Error.t()}
            | {:error, Tesla.Env.t()}
    def get_current_user(connection, _opts \\ []) do
-@@ -114,12 +114,26 @@ defmodule VRChat.Authentication do
+@@ -114,12 +114,25 @@ defmodule VRChat.Authentication do
        |> url("/auth/user")
        |> Enum.into([])
  
@@ -25,7 +25,6 @@ index ab4032a..1f79085 100644
 +           connection
 +           |> Connection.request(request)
 +           |> VRChat.Middleware.assign_session(request) do
-+            IO.inspect(response)
 +      {:ok, value} = evaluate_response(response, [
 +          {200, %VRChat.Model.CurrentUser{}},
 +          {401, %VRChat.Model.Error{}}
