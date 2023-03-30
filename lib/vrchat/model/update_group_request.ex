@@ -30,7 +30,7 @@ defmodule VRChat.Model.UpdateGroupRequest do
           :languages => [String.t()] | nil,
           :links => [String.t()] | nil,
           :rules => String.t() | nil,
-          :tags => [VRChat.Model.String.t()] | nil
+          :tags => [String.t()] | nil
         }
 end
 

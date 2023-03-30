@@ -24,7 +24,7 @@ defmodule VRChat.Model.CreateAvatarRequest do
           :id => String.t() | nil,
           :name => String.t(),
           :description => String.t() | nil,
-          :tags => [VRChat.Model.String.t()] | nil,
+          :tags => [String.t()] | nil,
           :imageUrl => String.t(),
           :releaseStatus => VRChat.Model.ReleaseStatus.t() | nil,
           :version => float() | nil,

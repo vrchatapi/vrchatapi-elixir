@@ -27,7 +27,7 @@ defmodule VRChat.Model.GroupMyMember do
           :id => String.t() | nil,
           :groupId => String.t() | nil,
           :userId => String.t() | nil,
-          :roleIds => [VRChat.Model.String.t()] | nil,
+          :roleIds => [String.t()] | nil,
           :managerNotes => String.t() | nil,
           :membershipStatus => String.t() | nil,
           :isSubscribedToAnnouncements => boolean() | nil,

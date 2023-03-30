@@ -23,7 +23,7 @@ defmodule VRChat.Model.File do
           :mimeType => VRChat.Model.MimeType.t(),
           :name => String.t(),
           :ownerId => String.t(),
-          :tags => [VRChat.Model.String.t()],
+          :tags => [String.t()],
           :versions => [VRChat.Model.FileVersion.t()]
         }
 end

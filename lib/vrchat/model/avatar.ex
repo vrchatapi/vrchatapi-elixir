@@ -40,7 +40,7 @@ defmodule VRChat.Model.Avatar do
           :imageUrl => String.t(),
           :name => String.t(),
           :releaseStatus => VRChat.Model.ReleaseStatus.t(),
-          :tags => [VRChat.Model.String.t()],
+          :tags => [String.t()],
           :thumbnailImageUrl => String.t(),
           :unityPackageUrl => String.t(),
           :unityPackageUrlObject => VRChat.Model.AvatarUnityPackageUrlObject.t(),

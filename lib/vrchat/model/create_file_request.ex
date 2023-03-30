@@ -18,7 +18,7 @@ defmodule VRChat.Model.CreateFileRequest do
           :name => String.t(),
           :mimeType => VRChat.Model.MimeType.t(),
           :extension => String.t(),
-          :tags => [VRChat.Model.String.t()] | nil
+          :tags => [String.t()] | nil
         }
 end
 

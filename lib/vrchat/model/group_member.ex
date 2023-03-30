@@ -29,7 +29,7 @@ defmodule VRChat.Model.GroupMember do
           :userId => String.t() | nil,
           :isRepresenting => boolean() | nil,
           :user => VRChat.Model.GroupMemberLimitedUser.t() | nil,
-          :roleIds => [VRChat.Model.String.t()] | nil,
+          :roleIds => [String.t()] | nil,
           :joinedAt => DateTime.t() | nil,
           :membershipStatus => String.t() | nil,
           :visibility => String.t() | nil,

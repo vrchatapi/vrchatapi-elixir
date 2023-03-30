@@ -54,7 +54,7 @@ defmodule VRChat.Model.Group do
           :memberCountSyncedAt => DateTime.t() | nil,
           :isVerified => boolean() | nil,
           :joinState => VRChat.Model.GroupJoinState.t() | nil,
-          :tags => [VRChat.Model.String.t()] | nil,
+          :tags => [String.t()] | nil,
           :galleries => [VRChat.Model.GroupGallery.t()] | nil,
           :createdAt => DateTime.t() | nil,
           :onlineMemberCount => integer() | nil,

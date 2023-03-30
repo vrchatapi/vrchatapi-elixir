@@ -61,7 +61,7 @@ defmodule VRChat.Model.World do
           :publicOccupants => integer() | nil,
           :publicationDate => String.t(),
           :releaseStatus => VRChat.Model.ReleaseStatus.t(),
-          :tags => [VRChat.Model.String.t()],
+          :tags => [String.t()],
           :thumbnailImageUrl => String.t(),
           :unityPackages => [VRChat.Model.UnityPackage.t()],
           :updated_at => DateTime.t(),

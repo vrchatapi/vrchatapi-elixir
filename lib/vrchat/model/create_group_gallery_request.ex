@@ -21,10 +21,10 @@ defmodule VRChat.Model.CreateGroupGalleryRequest do
           :name => String.t(),
           :description => String.t() | nil,
           :membersOnly => boolean() | nil,
-          :roleIdsToView => [VRChat.Model.String.t()] | nil,
-          :roleIdsToSubmit => [VRChat.Model.String.t()] | nil,
-          :roleIdsToAutoApprove => [VRChat.Model.String.t()] | nil,
-          :roleIdsToManage => [VRChat.Model.String.t()] | nil
+          :roleIdsToView => [String.t()] | nil,
+          :roleIdsToSubmit => [String.t()] | nil,
+          :roleIdsToAutoApprove => [String.t()] | nil,
+          :roleIdsToManage => [String.t()] | nil
         }
 end
 

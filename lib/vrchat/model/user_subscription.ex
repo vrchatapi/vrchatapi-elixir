@@ -39,7 +39,7 @@ defmodule VRChat.Model.UserSubscription do
           :expires => DateTime.t(),
           :created_at => DateTime.t(),
           :updated_at => DateTime.t(),
-          :licenseGroups => [VRChat.Model.String.t()],
+          :licenseGroups => [String.t()],
           :isGift => boolean()
         }
 end

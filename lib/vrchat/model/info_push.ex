@@ -26,7 +26,7 @@ defmodule VRChat.Model.InfoPush do
           :isEnabled => boolean(),
           :releaseStatus => VRChat.Model.ReleaseStatus.t(),
           :priority => integer(),
-          :tags => [VRChat.Model.String.t()],
+          :tags => [String.t()],
           :data => VRChat.Model.InfoPushData.t(),
           :hash => String.t(),
           :createdAt => DateTime.t(),

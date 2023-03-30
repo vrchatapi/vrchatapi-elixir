@@ -23,7 +23,7 @@ defmodule VRChat.Model.UpdateUserRequest do
           :email => String.t() | nil,
           :birthday => Date.t() | nil,
           :acceptedTOSVersion => float() | nil,
-          :tags => [VRChat.Model.String.t()] | nil,
+          :tags => [String.t()] | nil,
           :status => VRChat.Model.UserStatus.t() | nil,
           :statusDescription => String.t() | nil,
           :bio => String.t() | nil,

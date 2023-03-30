@@ -24,7 +24,7 @@ defmodule VRChat.Model.FavoriteGroup do
           :name => String.t(),
           :ownerDisplayName => String.t(),
           :ownerId => String.t(),
-          :tags => [VRChat.Model.String.t()],
+          :tags => [String.t()],
           :type => VRChat.Model.FavoriteType.t(),
           :visibility => VRChat.Model.FavoriteGroupVisibility.t()
         }

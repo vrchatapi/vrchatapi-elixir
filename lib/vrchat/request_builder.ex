@@ -170,6 +170,8 @@ defmodule VRChat.RequestBuilder do
 
   defp resolve_mapping(%Tesla.Env{status: status} = env, [{mapping_status, struct} | _], _)
        when status == mapping_status do
+    IO.inspect([env, struct])
+
     decode(env, struct)
   end
 

@@ -45,7 +45,7 @@ defmodule VRChat.Model.LimitedWorld do
           :popularity => integer(),
           :publicationDate => String.t(),
           :releaseStatus => VRChat.Model.ReleaseStatus.t(),
-          :tags => [VRChat.Model.String.t()],
+          :tags => [String.t()],
           :thumbnailImageUrl => String.t(),
           :unityPackages => [VRChat.Model.LimitedUnityPackage.t()],
           :updated_at => DateTime.t()

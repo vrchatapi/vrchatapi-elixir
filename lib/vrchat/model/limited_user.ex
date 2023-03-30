@@ -40,7 +40,7 @@ defmodule VRChat.Model.LimitedUser do
           :profilePicOverride => String.t(),
           :status => VRChat.Model.UserStatus.t(),
           :statusDescription => String.t(),
-          :tags => [VRChat.Model.String.t()],
+          :tags => [String.t()],
           :userIcon => String.t(),
           :username => String.t() | nil,
           :location => String.t() | nil,

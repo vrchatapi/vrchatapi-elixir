@@ -24,7 +24,7 @@ defmodule VRChat.Model.UpdateAvatarRequest do
           :id => String.t() | nil,
           :name => String.t() | nil,
           :description => String.t() | nil,
-          :tags => [VRChat.Model.String.t()] | nil,
+          :tags => [String.t()] | nil,
           :imageUrl => String.t() | nil,
           :releaseStatus => VRChat.Model.ReleaseStatus.t() | nil,
           :version => float() | nil,

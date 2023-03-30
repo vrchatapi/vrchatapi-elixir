@@ -51,7 +51,7 @@ defmodule VRChat.Model.Instance do
           :region => VRChat.Model.Region.t(),
           :secureName => String.t(),
           :shortName => String.t() | nil,
-          :tags => [VRChat.Model.String.t()],
+          :tags => [String.t()],
           :type => VRChat.Model.InstanceType.t(),
           :worldId => String.t(),
           :hidden => String.t() | nil,

@@ -62,7 +62,7 @@ defmodule VRChat.Model.User do
           :state => VRChat.Model.UserState.t(),
           :status => VRChat.Model.UserStatus.t(),
           :statusDescription => String.t(),
-          :tags => [VRChat.Model.String.t()],
+          :tags => [String.t()],
           :travelingToInstance => String.t() | nil,
           :travelingToLocation => String.t() | nil,
           :travelingToWorld => String.t() | nil,

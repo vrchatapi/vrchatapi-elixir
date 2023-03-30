@@ -36,7 +36,7 @@ defmodule VRChat.Model.CreateWorldRequest do
           :name => String.t(),
           :platform => String.t() | nil,
           :releaseStatus => VRChat.Model.ReleaseStatus.t() | nil,
-          :tags => [VRChat.Model.String.t()] | nil,
+          :tags => [String.t()] | nil,
           :unityPackageUrl => String.t() | nil,
           :unityVersion => String.t() | nil
         }

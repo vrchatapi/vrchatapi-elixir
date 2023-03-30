@@ -16,7 +16,7 @@ defmodule VRChat.Model.UpdateFavoriteGroupRequest do
   @type t :: %__MODULE__{
           :displayName => String.t() | nil,
           :visibility => VRChat.Model.FavoriteGroupVisibility.t() | nil,
-          :tags => [VRChat.Model.String.t()] | nil
+          :tags => [String.t()] | nil
         }
 end
 

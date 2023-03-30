@@ -16,7 +16,7 @@ defmodule VRChat.Model.AddFavoriteRequest do
   @type t :: %__MODULE__{
           :type => VRChat.Model.FavoriteType.t(),
           :favoriteId => String.t(),
-          :tags => [VRChat.Model.String.t()]
+          :tags => [String.t()]
         }
 end
 
