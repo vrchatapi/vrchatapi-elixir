@@ -38,9 +38,11 @@ Documentation can be found at [https://hexdocs.pm/vrchat](https://hexdocs.pm/vrc
 
 ## Usage
 ```elixir
-
-conn = VRChat.Connection.new(username, password)
-{:ok, user, conn} = VRChat.Authentication.get_current_user(tempconn)
+{:ok, user, conn} = VRChat.Authentication.login(
+  username: "...",
+  password: "...",
+  totp_token: "..."
+)
 
 VRChat.Avatars.get_avatar(conn, user.currentAvatar)
 ```

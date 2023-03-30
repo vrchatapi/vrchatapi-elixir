@@ -140,7 +140,7 @@ defmodule VRChat.Connection do
     ]
 
     [
-      {Tesla.Middleware.Logger, []},
+      # {Tesla.Middleware.Logger, []},
       {Tesla.Middleware.BaseUrl, base_url},
       {Tesla.Middleware.Headers, headers},
       {Tesla.Middleware.EncodeJson, engine: json_engine},
