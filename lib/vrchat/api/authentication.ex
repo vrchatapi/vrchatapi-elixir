@@ -116,10 +116,36 @@ defmodule VRChat.Authentication do
 
     connection
     |> Connection.request(request)
-    |> evaluate_response([
-      {200, %VRChat.Model.CurrentUser{}},
-      {401, %VRChat.Model.Error{}}
-    ])
+    |> assign_session(connection)
+  end
+
+  defp assign_session({:error, response}, _) do
+    {:ok, %VRChat.Model.Error{}, response}
+  end
+
+  defp assign_session({:ok, %Tesla.Env{headers: headers}} = response, connection) do
+    {code, user} =
+      response
+      |> evaluate_response([
+        {200, %VRChat.Model.CurrentUser{}},
+        {401, %VRChat.Model.Error{}}
+      ])
+
+    {code, user,
+     Connection.new(
+       headers:
+         headers
+         |> Enum.filter(fn {x, _} -> x == "set-cookie" end)
+         |> Enum.map(fn {"set-cookie", data} -> {"cookie", data} end)
+     )}
+  end
+
+  def login(options) when is_list(options) do
+    with {:ok, user, connection} <-
+           VRChat.Connection.new(options)
+           |> get_current_user() do
+      {:ok, connection, user}
+    end
   end
 
   @doc """
@@ -164,7 +190,7 @@ defmodule VRChat.Authentication do
 
   - `connection` (VRChat.Connection): Connection to server
   - `opts` (keyword): Optional parameters
-    - `:body` (TwoFactorAuthCode): 
+    - `:body` (TwoFactorAuthCode):
 
   ### Returns
 
@@ -204,7 +230,7 @@ defmodule VRChat.Authentication do
 
   - `connection` (VRChat.Connection): Connection to server
   - `opts` (keyword): Optional parameters
-    - `:body` (TwoFactorEmailCode): 
+    - `:body` (TwoFactorEmailCode):
 
   ### Returns
 
@@ -277,7 +303,7 @@ defmodule VRChat.Authentication do
 
   - `connection` (VRChat.Connection): Connection to server
   - `opts` (keyword): Optional parameters
-    - `:body` (TwoFactorAuthCode): 
+    - `:body` (TwoFactorAuthCode):
 
   ### Returns
 

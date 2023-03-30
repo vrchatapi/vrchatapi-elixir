@@ -1,8 +1,8 @@
 diff --git a/lib/vrchat/api/authentication.ex b/lib/vrchat/api/authentication.ex
-index ab4032a..b3fc4da 100644
+index ab4032a..d7b5937 100644
 --- a/lib/vrchat/api/authentication.ex
 +++ b/lib/vrchat/api/authentication.ex
-@@ -116,10 +116,26 @@ defmodule VRChat.Authentication do
+@@ -116,10 +116,36 @@ defmodule VRChat.Authentication do
  
      connection
      |> Connection.request(request)
@@ -14,7 +14,7 @@ index ab4032a..b3fc4da 100644
 +  end
 +
 +  defp assign_session({:error, response}, _) do
-+    {401, %VRChat.Model.Error{}, response}
++    {:ok, %VRChat.Model.Error{}, response}
 +  end
 +
 +  defp assign_session({:ok, %Tesla.Env{headers: headers}} = response, connection) do
@@ -25,35 +25,89 @@ index ab4032a..b3fc4da 100644
 +        {401, %VRChat.Model.Error{}}
 +      ])
 +
-+      {code, user, Connection.new(
-+        headers: headers
-+          |> Enum.filter(fn {x, _} -> x == "set-cookie" end)
-+          |> Enum.map(fn {"set-cookie", data} -> {"cookie", data} end)
-+      )}
++    {code, user,
++     Connection.new(
++       headers:
++         headers
++         |> Enum.filter(fn {x, _} -> x == "set-cookie" end)
++         |> Enum.map(fn {"set-cookie", data} -> {"cookie", data} end)
++     )}
++  end
++
++  def login(options) when is_list(options) do
++    with {:ok, user, connection} <-
++           VRChat.Connection.new(options)
++           |> get_current_user() do
++      {:ok, connection, user}
++    end
    end
  
    @doc """
+@@ -164,7 +190,7 @@ defmodule VRChat.Authentication do
+ 
+   - `connection` (VRChat.Connection): Connection to server
+   - `opts` (keyword): Optional parameters
+-    - `:body` (TwoFactorAuthCode): 
++    - `:body` (TwoFactorAuthCode):
+ 
+   ### Returns
+ 
+@@ -204,7 +230,7 @@ defmodule VRChat.Authentication do
+ 
+   - `connection` (VRChat.Connection): Connection to server
+   - `opts` (keyword): Optional parameters
+-    - `:body` (TwoFactorEmailCode): 
++    - `:body` (TwoFactorEmailCode):
+ 
+   ### Returns
+ 
+@@ -277,7 +303,7 @@ defmodule VRChat.Authentication do
+ 
+   - `connection` (VRChat.Connection): Connection to server
+   - `opts` (keyword): Optional parameters
+-    - `:body` (TwoFactorAuthCode): 
++    - `:body` (TwoFactorAuthCode):
+ 
+   ### Returns
+ 
 diff --git a/lib/vrchat/connection.ex b/lib/vrchat/connection.ex
-index e4d1260..73b8e01 100644
+index e4d1260..3020b96 100644
 --- a/lib/vrchat/connection.ex
 +++ b/lib/vrchat/connection.ex
+@@ -23,7 +23,6 @@ defmodule VRChat.Connection do
+                       "https://api.vrchat.cloud/api/1"
+                     )
+ 
+-
+   @typedoc """
+   The list of options that can be passed to new/1.
+ 
 @@ -37,6 +36,7 @@ defmodule VRChat.Connection do
            {:user_agent, String.t()},
            {:username, String.t() | nil},
            {:password, String.t() | nil},
-+          {:headers, [{String.t(), String.t()}] | nil},
++          {:headers, [{String.t(), String.t()}] | nil}
          ]
  
    @doc "Forward requests to Tesla."
-@@ -87,7 +87,7 @@ defmodule VRChat.Connection do
+@@ -87,8 +87,7 @@ defmodule VRChat.Connection do
  
    Tesla.Env.client
    """
 -  @spec new(String.t(), String.t()), options) :: Tesla.Env.client()
+-
 +  @spec new(String.t(), String.t(), options) :: Tesla.Env.client()
  
- 
    def new(username, password, options) when is_binary(username) and is_binary(password) do
+     options
+@@ -125,6 +124,7 @@ defmodule VRChat.Connection do
+ 
+     username = Keyword.get(options, :username)
+     password = Keyword.get(options, :password)
++
+     middleware =
+       if username || password do
+         [{Tesla.Middleware.BasicAuth, %{username: username, password: password}} | middleware]
 @@ -132,16 +132,16 @@ defmodule VRChat.Connection do
          middleware
        end
@@ -73,3 +127,83 @@ index e4d1260..73b8e01 100644
    @doc """
    Returns the default adapter for this API.
    """
+diff --git a/patches/authentication.patch b/patches/authentication.patch
+index 1f6cf29..e69de29 100644
+--- a/patches/authentication.patch
++++ b/patches/authentication.patch
+@@ -1,75 +0,0 @@
+-diff --git a/lib/vrchat/api/authentication.ex b/lib/vrchat/api/authentication.ex
+-index ab4032a..b3fc4da 100644
+---- a/lib/vrchat/api/authentication.ex
+-+++ b/lib/vrchat/api/authentication.ex
+-@@ -116,10 +116,26 @@ defmodule VRChat.Authentication do
+- 
+-     connection
+-     |> Connection.request(request)
+--    |> evaluate_response([
+--      {200, %VRChat.Model.CurrentUser{}},
+--      {401, %VRChat.Model.Error{}}
+--    ])
+-+    |> assign_session(connection)
+-+  end
+-+
+-+  defp assign_session({:error, response}, _) do
+-+    {401, %VRChat.Model.Error{}, response}
+-+  end
+-+
+-+  defp assign_session({:ok, %Tesla.Env{headers: headers}} = response, connection) do
+-+    {code, user} =
+-+      response
+-+      |> evaluate_response([
+-+        {200, %VRChat.Model.CurrentUser{}},
+-+        {401, %VRChat.Model.Error{}}
+-+      ])
+-+
+-+      {code, user, Connection.new(
+-+        headers: headers
+-+          |> Enum.filter(fn {x, _} -> x == "set-cookie" end)
+-+          |> Enum.map(fn {"set-cookie", data} -> {"cookie", data} end)
+-+      )}
+-   end
+- 
+-   @doc """
+-diff --git a/lib/vrchat/connection.ex b/lib/vrchat/connection.ex
+-index e4d1260..73b8e01 100644
+---- a/lib/vrchat/connection.ex
+-+++ b/lib/vrchat/connection.ex
+-@@ -37,6 +36,7 @@ defmodule VRChat.Connection do
+-           {:user_agent, String.t()},
+-           {:username, String.t() | nil},
+-           {:password, String.t() | nil},
+-+          {:headers, [{String.t(), String.t()}] | nil},
+-         ]
+- 
+-   @doc "Forward requests to Tesla."
+-@@ -87,7 +87,7 @@ defmodule VRChat.Connection do
+- 
+-   Tesla.Env.client
+-   """
+--  @spec new(String.t(), String.t()), options) :: Tesla.Env.client()
+-+  @spec new(String.t(), String.t(), options) :: Tesla.Env.client()
+- 
+- 
+-   def new(username, password, options) when is_binary(username) and is_binary(password) do
+-@@ -132,16 +132,16 @@ defmodule VRChat.Connection do
+-         middleware
+-       end
+- 
+-+    headers = [{"user-agent", user_agent}] ++ Keyword.get(options, :headers, [])
+- 
+-     [
+-       {Tesla.Middleware.BaseUrl, base_url},
+--      {Tesla.Middleware.Headers, [{"user-agent", user_agent}]},
+-+      {Tesla.Middleware.Headers, headers},
+-       {Tesla.Middleware.EncodeJson, engine: json_engine}
+-       | middleware
+-     ]
+-   end
+- 
+--
+-   @doc """
+-   Returns the default adapter for this API.
+-   """
