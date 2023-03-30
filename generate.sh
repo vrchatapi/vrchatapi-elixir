@@ -30,10 +30,16 @@ sed -i "s/Elixir/vrchat-elixir/" ./lib/vrchat/connection.ex
 find . -type f -name "*.ex" -exec sed -i "s/VRChat.Api./VRChat./g" {} \;
 find . -type f -name "*.ex" -exec sed -i "s/VRChat.Model.String/String/g" {} \;
 
-#git apply patches/authentication.patch
-
+cp ./patches/middleware.ex ./lib/vrchat/middleware.ex
+git apply --whitespace=fix patches/dependencies.patch
 mix deps.get
+
+git apply --whitespace=fix patches/connection.patch
 mix format
+
+git apply --whitespace=fix patches/authentication.patch
+mix format
+
 mix compile
 
 # Set up cookie based authentication

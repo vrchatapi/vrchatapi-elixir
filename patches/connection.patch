@@ -1,0 +1,65 @@
+diff --git a/lib/vrchat/connection.ex b/lib/vrchat/connection.ex
+index e4d1260..1a9bf6a 100644
+--- a/lib/vrchat/connection.ex
++++ b/lib/vrchat/connection.ex
+@@ -23,7 +23,6 @@ defmodule VRChat.Connection do
+                       "https://api.vrchat.cloud/api/1"
+                     )
+ 
+-
+   @typedoc """
+   The list of options that can be passed to new/1.
+ 
+@@ -37,6 +36,8 @@ defmodule VRChat.Connection do
+           {:user_agent, String.t()},
+           {:username, String.t() | nil},
+           {:password, String.t() | nil},
++          {:totp_secret, String.t() | nil},
++          {:cookies, [{String.t(), String.t()}] | nil}
+         ]
+ 
+   @doc "Forward requests to Tesla."
+@@ -87,8 +88,7 @@ defmodule VRChat.Connection do
+ 
+   Tesla.Env.client
+   """
+-  @spec new(String.t(), String.t()), options) :: Tesla.Env.client()
+-
++  @spec new(String.t(), String.t(), options) :: Tesla.Env.client()
+ 
+   def new(username, password, options) when is_binary(username) and is_binary(password) do
+     options
+@@ -125,6 +125,8 @@ defmodule VRChat.Connection do
+ 
+     username = Keyword.get(options, :username)
+     password = Keyword.get(options, :password)
++    totp_secret = Keyword.get(options, :totp_secret)
++
+     middleware =
+       if username || password do
+         [{Tesla.Middleware.BasicAuth, %{username: username, password: password}} | middleware]
+@@ -132,16 +134,21 @@ defmodule VRChat.Connection do
+         middleware
+       end
+ 
++    headers = [
++      {"user-agent", user_agent},
++      {"cookie", VRChat.Middleware.stringify_cookies(Keyword.get(options, :cookies, []))}
++    ]
+ 
+     [
++      {Tesla.Middleware.Logger, []},
+       {Tesla.Middleware.BaseUrl, base_url},
+-      {Tesla.Middleware.Headers, [{"user-agent", user_agent}]},
+-      {Tesla.Middleware.EncodeJson, engine: json_engine}
++      {Tesla.Middleware.Headers, headers},
++      {Tesla.Middleware.EncodeJson, engine: json_engine},
++      {VRChat.Middleware, totp_secret: totp_secret}
+       | middleware
+     ]
+   end
+ 
+-
+   @doc """
+   Returns the default adapter for this API.
+   """

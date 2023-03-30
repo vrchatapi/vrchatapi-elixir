@@ -1,0 +1,12 @@
+diff --git a/mix.exs b/mix.exs
+index e632336..843dc20 100644
+--- a/mix.exs
++++ b/mix.exs
+@@ -36,6 +36,7 @@ defmodule VRChat.Mixfile do
+     [
+       {:tesla, "~> 1.4"},
+       {:poison, "~> 3.0"},
++      {:nimble_totp, "~> 1.0"},
+       {:ex_doc, "~> 0.28", only: :dev, runtime: false}
+     ]
+   end

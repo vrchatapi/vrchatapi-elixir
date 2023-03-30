@@ -104,7 +104,7 @@ defmodule VRChat.Authentication do
   - `{:error, Tesla.Env.t}` on failure
   """
   @spec get_current_user(Tesla.Env.client(), keyword()) ::
-          {:ok, VRChat.Model.CurrentUser.t()}
+          {:ok, Tesla.Env.client(), VRChat.Model.CurrentUser.t()}
           | {:ok, VRChat.Model.Error.t()}
           | {:error, Tesla.Env.t()}
   def get_current_user(connection, _opts \\ []) do
@@ -114,12 +114,28 @@ defmodule VRChat.Authentication do
       |> url("/auth/user")
       |> Enum.into([])
 
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, %VRChat.Model.CurrentUser{}},
-      {401, %VRChat.Model.Error{}}
-    ])
+    with {:ok, response, conn} <-
+           connection
+           |> Connection.request(request)
+           |> VRChat.Middleware.assign_session(request) do
+      IO.inspect(response)
+
+      {:ok, value} =
+        evaluate_response(response, [
+          {200, %VRChat.Model.CurrentUser{}},
+          {401, %VRChat.Model.Error{}}
+        ])
+
+      {:ok, conn, value}
+    end
+  end
+
+  def login(options) when is_list(options) do
+    with {:ok, conn, user} <-
+           VRChat.Connection.new(options)
+           |> get_current_user() do
+      {:ok, conn, user}
+    end
   end
 
   @doc """
@@ -164,7 +180,7 @@ defmodule VRChat.Authentication do
 
   - `connection` (VRChat.Connection): Connection to server
   - `opts` (keyword): Optional parameters
-    - `:body` (TwoFactorAuthCode): 
+    - `:body` (TwoFactorAuthCode):
 
   ### Returns
 
@@ -172,7 +188,7 @@ defmodule VRChat.Authentication do
   - `{:error, Tesla.Env.t}` on failure
   """
   @spec verify2_fa(Tesla.Env.client(), keyword()) ::
-          {:ok, VRChat.Model.Verify2FaResult.t()}
+          {:ok, Tesla.Env.client(), VRChat.Model.Verify2FaResult.t()}
           | {:ok, VRChat.Model.Error.t()}
           | {:error, Tesla.Env.t()}
   def verify2_fa(connection, opts \\ []) do
@@ -188,12 +204,18 @@ defmodule VRChat.Authentication do
       |> ensure_body()
       |> Enum.into([])
 
-    connection
-    |> Connection.request(request)
-    |> evaluate_response([
-      {200, %VRChat.Model.Verify2FaResult{}},
-      {401, %VRChat.Model.Error{}}
-    ])
+    with {:ok, response, conn} <-
+           connection
+           |> Connection.request(request)
+           |> VRChat.Middleware.assign_session(request) do
+      {:ok, value} =
+        evaluate_response(response, [
+          {200, %VRChat.Model.Verify2FaResult{}},
+          {401, %VRChat.Model.Error{}}
+        ])
+
+      {:ok, conn, value}
+    end
   end
 
   @doc """
@@ -204,7 +226,7 @@ defmodule VRChat.Authentication do
 
   - `connection` (VRChat.Connection): Connection to server
   - `opts` (keyword): Optional parameters
-    - `:body` (TwoFactorEmailCode): 
+    - `:body` (TwoFactorEmailCode):
 
   ### Returns
 
@@ -277,7 +299,7 @@ defmodule VRChat.Authentication do
 
   - `connection` (VRChat.Connection): Connection to server
   - `opts` (keyword): Optional parameters
-    - `:body` (TwoFactorAuthCode): 
+    - `:body` (TwoFactorAuthCode):
 
   ### Returns
 
