@@ -36,6 +36,7 @@ defmodule VRChat.Connection do
           {:user_agent, String.t()},
           {:username, String.t() | nil},
           {:password, String.t() | nil},
+          {:headers, [{String.t(), String.t()}] | nil},
         ]
 
   @doc "Forward requests to Tesla."
@@ -86,7 +87,7 @@ defmodule VRChat.Connection do
 
   Tesla.Env.client
   """
-  @spec new(String.t(), String.t()), options) :: Tesla.Env.client()
+  @spec new(String.t(), String.t(), options) :: Tesla.Env.client()
 
 
   def new(username, password, options) when is_binary(username) and is_binary(password) do
@@ -124,7 +125,6 @@ defmodule VRChat.Connection do
 
     username = Keyword.get(options, :username)
     password = Keyword.get(options, :password)
-
     middleware =
       if username || password do
         [{Tesla.Middleware.BasicAuth, %{username: username, password: password}} | middleware]
@@ -132,9 +132,11 @@ defmodule VRChat.Connection do
         middleware
       end
 
+    headers = [{"user-agent", user_agent}] ++ Keyword.get(options, :headers, [])
+
     [
       {Tesla.Middleware.BaseUrl, base_url},
-      {Tesla.Middleware.Headers, [{"user-agent", user_agent}]},
+      {Tesla.Middleware.Headers, headers},
       {Tesla.Middleware.EncodeJson, engine: json_engine}
       | middleware
     ]
