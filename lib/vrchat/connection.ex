@@ -134,9 +134,14 @@ defmodule VRChat.Connection do
         middleware
       end
 
+    cookies =
+      VRChat.Middleware.stringify_cookies(
+        Keyword.get(options, :cookies, []) ++ [{"apiKey", "JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26"}]
+      )
+
     headers = [
       {"user-agent", user_agent},
-      {"cookie", VRChat.Middleware.stringify_cookies(Keyword.get(options, :cookies, []))}
+      {"cookie", cookies}
     ]
 
     [

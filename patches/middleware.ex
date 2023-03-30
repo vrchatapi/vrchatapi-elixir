@@ -91,7 +91,7 @@ defmodule VRChat.Middleware do
                  }
                ),
              {:ok, response} <- Connection.request(client, request) do
-          {:ok, client, response}
+          {:ok, client, {:ok, response}}
         end
 
       _ ->

@@ -38,13 +38,17 @@ index e4d1260..1a9bf6a 100644
      middleware =
        if username || password do
          [{Tesla.Middleware.BasicAuth, %{username: username, password: password}} | middleware]
-@@ -132,16 +134,21 @@ defmodule VRChat.Connection do
+@@ -132,16 +134,25 @@ defmodule VRChat.Connection do
          middleware
        end
  
++    cookies = VRChat.Middleware.stringify_cookies(
++      Keyword.get(options, :cookies, []) ++ [{"apiKey", "JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26"}]
++    )
++
 +    headers = [
 +      {"user-agent", user_agent},
-+      {"cookie", VRChat.Middleware.stringify_cookies(Keyword.get(options, :cookies, []))}
++      {"cookie", cookies}
 +    ]
  
      [
