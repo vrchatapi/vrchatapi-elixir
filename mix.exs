@@ -10,7 +10,12 @@ defmodule VRChat.Mixfile do
       start_permanent: Mix.env() == :prod,
       package: package(),
       description: "VRChat API for Elixir",
-      deps: deps()
+      deps: deps(),
+      source_url: "https://github.com/vrchatapi/vrchat-elixir",
+      docs: [
+        main: "readme",
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -43,7 +48,12 @@ defmodule VRChat.Mixfile do
   defp package do
     [
       name: "vrchat",
-      files: ~w(.formatter.exs config lib mix.exs README* LICENSE*)
+      files: ~w(.formatter.exs config lib mix.exs README* LICENSE*),
+      licenses: ["MIT"],
+      links: %{
+        "GitHub" => "https://github.com/vrchatapi/vrchat-elixir",
+        "Specification" => "https://github.com/vrchatapi/specification/"
+      }
     ]
   end
 end

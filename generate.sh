@@ -47,5 +47,7 @@ version=$(cat ./mix.exs | grep "version: " | cut -d '"' -f 2)
 sed -i "s/\"~> [0-9]\+\.[0-9]\+\.[0-9]\+\"/\"~> $version\"/" README.md
 sed -zi 's/\(description:\n\)[^\n]*/description: "VRChat API for Elixir",/' mix.exs
 
+git apply --whitespace=fix patches/mix.patch
+
 # Set up cookie based authentication
 # git apply --ignore-space-change --ignore-whitespace ./patches/cookies.patch
