@@ -26,7 +26,6 @@ mv ./lib/vr_chat ./lib/vrchat
 sed -i "s/vr_chat/vrchat/g" ./.openapi-generator/FILES
 
 sed -i "s/Elixir/vrchat-elixir/" ./lib/vrchat/connection.ex
-# sed -i "s/Elixir/vrchat-elixir/" ./README.md
 
 find . -type f -name "*.ex" -exec sed -i "s/VRChat.Api./VRChat./g" {} \;
 find . -type f -name "*.ex" -exec sed -i "s/VRChat.Model.String/String/g" {} \;
@@ -42,6 +41,9 @@ git apply --whitespace=fix patches/authentication.patch
 mix format
 
 mix compile
+
+sed -i "s/vrchat-elixir/Elixir/" ./README.md
+
 
 version=$(cat ./mix.exs | grep "version: " | cut -d '"' -f 2)
 sed -i "s/\"~> [0-9]\+\.[0-9]\+\.[0-9]\+\"/\"~> $version\"/" README.md
