@@ -39,8 +39,8 @@ jobs:
         restore-keys: ${{ runner.os }}-mix-
 
     - name: Check version number
-        run: |
-          echo "spec_version=$(cat ./mix.exs | grep "version: " | cut -d '"' -f 2)" >> $GITHUB_ENV
+      run: |
+        echo "spec_version=$(cat ./mix.exs | grep "version: " | cut -d '"' -f 2)" >> $GITHUB_ENV
 
     - name: Generate client
         run: bash ./generate.sh
