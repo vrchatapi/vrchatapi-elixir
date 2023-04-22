@@ -23,13 +23,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    
     - name: Set up Elixir
       uses: erlef/setup-beam@988e02bfe678367a02564f65ca2e37726dc0268f
       with:
         elixir-version: '1.12.3' # Define the elixir version [required]
         otp-version: '24.1' # Define the OTP version [required]
       env:
-          ImageOS: ubuntu20
+        ImageOS: ubuntu20
         
     - name: Restore dependencies cache
       uses: actions/cache@v3
@@ -43,7 +44,7 @@ jobs:
         echo "spec_version=$(cat ./mix.exs | grep "version: " | cut -d '"' -f 2)" >> $GITHUB_ENV
 
     - name: Generate client
-        run: bash ./generate.sh
+      run: bash ./generate.sh
         
     - name: Install dependencies
       run: mix deps.get
