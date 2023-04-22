@@ -8,7 +8,7 @@ index 439f102..5b2b27b 100644
        description: "VRChat API for Elixir",
 -      deps: deps()
 +      deps: deps(),
-+      source_url: "https://github.com/vrchatapi/vrchat-elixir",
++      source_url: "https://github.com/vrchatapi/vrchatapi-elixir",
 +      docs: [
 +        main: "readme",
 +        extras: ["README.md"]
@@ -24,7 +24,7 @@ index 439f102..5b2b27b 100644
 +      files: ~w(.formatter.exs config lib mix.exs README* LICENSE*),
 +      licenses: ["MIT"],
 +      links: %{
-+        "GitHub" => "https://github.com/vrchatapi/vrchat-elixir",
++        "GitHub" => "https://github.com/vrchatapi/vrchatapi-elixir",
 +        "Specification" => "https://github.com/vrchatapi/specification/"
 +      }
      ]
