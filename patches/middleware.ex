@@ -79,7 +79,7 @@ defmodule VRChat.Middleware do
       |> Keyword.get(:totp_secret)
       |> Base.decode32!()
 
-    case Poison.decode!(response.body) do
+    case JSON.decode!(response.body) do
       %{"requiresTwoFactorAuth" => ["emailOtp"]} ->
         raise "email two factor not supported, consider enabling totp and provide the generation secret via :totp_secret"
 

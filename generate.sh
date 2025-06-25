@@ -1,34 +1,47 @@
 #!/bin/bash
 set -e
 
+sedi() {
+	sed "$1" "$2" > "$2.tmp" && mv "$2.tmp" "$2"
+}
+
 npm install @openapitools/openapi-generator-cli
 
-rm lib test config *.exs *.lock -rf
+rm -rf lib test config *.exs *.lock
+
+curl https://vrchat.community/openapi.yaml > openapi.yaml
+VERSION=$(yq .info.version openapi.yaml)
 
 ./node_modules/\@openapitools/openapi-generator-cli/main.js generate \
 	-g elixir \
 	--additional-properties="packageName=vrchat,invokerPackage=VRChat" \
 	--git-user-id=vrchatapi \
-	--git-repo-id=vrchat-elixir \
+	--git-repo-id=vrchatapi-elixir \
 	-o . \
-	-i https://raw.githubusercontent.com/vrchatapi/specification/gh-pages/openapi.yaml \
+	-i openapi.yaml \
 	--http-user-agent="vrchatapi-elixir"
+
+# Fix version
+
+sedi "s/version: \"1.0.0\"/version: \"$VERSION\"/" ./mix.exs
+sedi "s/1.0.0 - elixir/$VERSION - elixir/" ./lib/vr_chat/connection.ex
 
 # Rename config key
 
-sed -i "s/vr_chat_api_documentation/vrchat/" ./config/config.exs
-sed -i "s/VR_CHAT_API_DOCUMENTATION/VRCHAT/" ./config/runtime.exs
-sed -i "s/vr_chat_api_documentation/vrchat/" ./config/runtime.exs
-sed -i "s/vr_chat_api_documentation/vrchat/" ./lib/vr_chat/connection.ex
+sedi "s/vr_chat_api_documentation/vrchat/" ./config/config.exs
+sedi "s/VR_CHAT_API_DOCUMENTATION/VRCHAT/" ./config/runtime.exs
+sedi "s/vr_chat_api_documentation/vrchat/" ./config/runtime.exs
+sedi "s/vr_chat_api_documentation/vrchat/" ./lib/vr_chat/connection.ex
 
 # Rename folder
 mv ./lib/vr_chat ./lib/vrchat
-sed -i "s/vr_chat/vrchat/g" ./.openapi-generator/FILES
+sedi "s/vr_chat/vrchat/g" ./.openapi-generator/FILES
 
-sed -i "s/Elixir/vrchat-elixir/" ./lib/vrchat/connection.ex
+sedi "s/Elixir/vrchat-elixir/" ./lib/vrchat/connection.ex
 
-find . -type f -name "*.ex" -exec sed -i "s/VRChat.Api./VRChat./g" {} \;
-find . -type f -name "*.ex" -exec sed -i "s/VRChat.Model.String/String/g" {} \;
+find lib -type f -name "*.ex" | while IFS= read -r file; do
+	sedi "s/VRChat.Api./VRChat./g; s/VRChat.Model.String/String/g" "$file"
+done
 
 cp ./patches/middleware.ex ./lib/vrchat/middleware.ex
 git apply --whitespace=fix patches/dependencies.patch
@@ -42,12 +55,12 @@ mix format
 
 mix compile
 
-sed -i "s/vrchat-elixir/Elixir/" ./README.md
+sedi "s/vrchat-elixir/Elixir/" ./README.md
 
 
-version=$(cat ./mix.exs | grep "version: " | cut -d '"' -f 2)
-sed -i "s/\"~> [0-9]\+\.[0-9]\+\.[0-9]\+\"/\"~> $version\"/" README.md
-sed -zi 's/\(description:\n\)[^\n]*/description: "VRChat API for Elixir",/' mix.exs
+version=$(grep "version: " ./mix.exs | cut -d '"' -f 2)
+sedi "s/\"~> [0-9]*\.[0-9]*\.[0-9]*\"/\"~> $version\"/" README.md
+sedi '/description: """/{N;N;s/description: """.*""",/description: "VRChat API for Elixir",/;}' mix.exs
 
 git apply --whitespace=fix patches/mix.patch
 
