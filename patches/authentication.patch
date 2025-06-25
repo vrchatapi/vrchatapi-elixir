@@ -1,8 +1,8 @@
 diff --git a/lib/vrchat/api/authentication.ex b/lib/vrchat/api/authentication.ex
-index ab4032a..1f79085 100644
+index 7a28181..99451bf 100644
 --- a/lib/vrchat/api/authentication.ex
 +++ b/lib/vrchat/api/authentication.ex
-@@ -104,7 +104,7 @@ defmodule VRChat.Authentication do
+@@ -238,7 +238,7 @@ defmodule VRChat.Authentication do
    - `{:error, Tesla.Env.t}` on failure
    """
    @spec get_current_user(Tesla.Env.client(), keyword()) ::
@@ -11,23 +11,23 @@ index ab4032a..1f79085 100644
            | {:ok, VRChat.Model.Error.t()}
            | {:error, Tesla.Env.t()}
    def get_current_user(connection, _opts \\ []) do
-@@ -114,12 +114,25 @@ defmodule VRChat.Authentication do
+@@ -248,12 +248,25 @@ defmodule VRChat.Authentication do
        |> url("/auth/user")
        |> Enum.into([])
  
 -    connection
 -    |> Connection.request(request)
 -    |> evaluate_response([
--      {200, %VRChat.Model.CurrentUser{}},
--      {401, %VRChat.Model.Error{}}
+-      {200, VRChat.Model.CurrentUser},
+-      {401, VRChat.Model.Error}
 -    ])
 +    with {:ok, response, conn} <-
 +           connection
 +           |> Connection.request(request)
 +           |> VRChat.Middleware.assign_session(request) do
 +      {:ok, value} = evaluate_response(response, [
-+          {200, %VRChat.Model.CurrentUser{}},
-+          {401, %VRChat.Model.Error{}}
++          {200, VRChat.Model.CurrentUser},
++          {401, VRChat.Model.Error}
 +        ])
 +
 +      {:ok, conn, value}
@@ -43,41 +43,32 @@ index ab4032a..1f79085 100644
    end
  
    @doc """
-@@ -164,7 +178,7 @@ defmodule VRChat.Authentication do
- 
-   - `connection` (VRChat.Connection): Connection to server
-   - `opts` (keyword): Optional parameters
--    - `:body` (TwoFactorAuthCode): 
-+    - `:body` (TwoFactorAuthCode):
- 
-   ### Returns
- 
-@@ -172,7 +186,7 @@ defmodule VRChat.Authentication do
+@@ -412,7 +425,7 @@ defmodule VRChat.Authentication do
    - `{:error, Tesla.Env.t}` on failure
    """
-   @spec verify2_fa(Tesla.Env.client(), keyword()) ::
+   @spec verify2_fa(Tesla.Env.client(), VRChat.Model.TwoFactorAuthCode.t(), keyword()) ::
 -          {:ok, VRChat.Model.Verify2FaResult.t()}
 +          {:ok, Tesla.Env.client(), VRChat.Model.Verify2FaResult.t()}
            | {:ok, VRChat.Model.Error.t()}
            | {:error, Tesla.Env.t()}
-   def verify2_fa(connection, opts \\ []) do
-@@ -188,12 +202,17 @@ defmodule VRChat.Authentication do
-       |> ensure_body()
+   def verify2_fa(connection, two_factor_auth_code, _opts \\ []) do
+@@ -423,12 +436,17 @@ defmodule VRChat.Authentication do
+       |> add_param(:body, :body, two_factor_auth_code)
        |> Enum.into([])
  
 -    connection
 -    |> Connection.request(request)
 -    |> evaluate_response([
--      {200, %VRChat.Model.Verify2FaResult{}},
--      {401, %VRChat.Model.Error{}}
+-      {200, VRChat.Model.Verify2FaResult},
+-      {401, VRChat.Model.Error}
 -    ])
 +    with {:ok, response, conn} <-
 +           connection
 +           |> Connection.request(request)
 +           |> VRChat.Middleware.assign_session(request) do
 +      {:ok, value} = evaluate_response(response, [
-+        {200, %VRChat.Model.Verify2FaResult{}},
-+        {401, %VRChat.Model.Error{}}
++        {200, VRChat.Model.Verify2FaResult},
++        {401, VRChat.Model.Error}
 +      ])
 +
 +      {:ok, conn, value}
@@ -85,21 +76,3 @@ index ab4032a..1f79085 100644
    end
  
    @doc """
-@@ -204,7 +223,7 @@ defmodule VRChat.Authentication do
- 
-   - `connection` (VRChat.Connection): Connection to server
-   - `opts` (keyword): Optional parameters
--    - `:body` (TwoFactorEmailCode): 
-+    - `:body` (TwoFactorEmailCode):
- 
-   ### Returns
- 
-@@ -277,7 +296,7 @@ defmodule VRChat.Authentication do
- 
-   - `connection` (VRChat.Connection): Connection to server
-   - `opts` (keyword): Optional parameters
--    - `:body` (TwoFactorAuthCode): 
-+    - `:body` (TwoFactorAuthCode):
- 
-   ### Returns
- 
