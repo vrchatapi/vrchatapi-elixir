@@ -7,9 +7,9 @@ name: Elixir CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
   repository_dispatch:
     types: [spec_release]
   workflow_dispatch:
@@ -56,6 +56,6 @@ jobs:
     #     commit-message: "feat: update to specification ${{ env.spec_version }}"
 
     - name: Publish
-      run: mix hex.publish --yes
+      run: mix hex.publish --yes --replace
       env:
         HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
