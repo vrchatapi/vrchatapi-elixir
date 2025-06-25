@@ -86,7 +86,7 @@ defmodule VRChat.Middleware do
       %{"requiresTwoFactorAuth" => ["totp", "otp"]} ->
         with {:ok, client, _} <-
                VRChat.Authentication.verify2_fa(client,
-                 body: %VRChat.Model.TwoFactorAuthCode{
+                 %VRChat.Model.TwoFactorAuthCode{
                    code: NimbleTOTP.verification_code(totp_secret, time: NaiveDateTime.utc_now())
                  }
                ),

@@ -38,10 +38,10 @@ Documentation can be found at [https://hexdocs.pm/vrchat](https://hexdocs.pm/vrc
 
 ## Usage
 ```elixir
-{:ok, user, conn} = VRChat.Authentication.login(
+{:ok, conn, user} = VRChat.Authentication.login(
   username: "...",
   password: "...",
-  totp_token: "..."
+  totp_secret: "..."
 )
 
 VRChat.Avatars.get_avatar(conn, user.currentAvatar)
